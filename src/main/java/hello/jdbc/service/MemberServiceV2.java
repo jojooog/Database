@@ -28,21 +28,8 @@ public class MemberServiceV2 {
             con.setAutoCommit(false); //트랜잭션 시작
 
             //비즈니스 로직 수행
+            logic(con, fromId,toId, money );
 
-            Member fromMember = memberRepository.findById(con, fromId);
-            Member toMember = memberRepository.findById(con, toId);
-
-            memberRepository.update(con, fromId, fromMember.getMoney() - money);
-
-            //예외발생 테스트
-            validation(toMember);
-
-            //검증에서 에러가 발생하면 그 다음 update 로직으로 못넘어간다
-            //커밋 이나 롤백
-            memberRepository.update(con, toId, toMember.getMoney() + money);
-
-            //정상적으로 수행되면 commit
-            con.commit();
 
             //예외가 발생할 경우 처리
         } catch(Exception e) {
@@ -79,6 +66,23 @@ public class MemberServiceV2 {
         if (toMember.getMemberId().equals("ex")) {
             throw new IllegalStateException("계좌이체중 예외 발생");
         }
+    }
+
+    private void logic(Connection con, String fromId, String toId, int money) throws Exception {
+        Member fromMember = memberRepository.findById(con, fromId);
+        Member toMember = memberRepository.findById(con, toId);
+
+        memberRepository.update(con, fromId, fromMember.getMoney() - money);
+
+        //예외발생 테스트
+        validation(toMember);
+
+        //검증에서 에러가 발생하면 그 다음 update 로직으로 못넘어간다
+        //커밋 이나 롤백
+        memberRepository.update(con, toId, toMember.getMoney() + money);
+
+        //정상적으로 수행되면 commit
+        con.commit();
     }
 
 
