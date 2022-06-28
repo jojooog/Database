@@ -3,6 +3,7 @@ package hello.jdbc.service;
 
 import hello.jdbc.domain.Member;
 import hello.jdbc.repository.MemberRepositoryV1;
+import hello.jdbc.repository.MemberRepositoryV2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,7 @@ public class MemberServiceV2 {
 
     private final DataSource dataSource;
 
-    private final MemberRepositoryV1 memberRepositoryV1;
+    private final MemberRepositoryV2 memberRepository;
 
     public void accountTransfer(String fromId, String toId, int money) throws SQLException {
 
@@ -27,17 +28,18 @@ public class MemberServiceV2 {
             con.setAutoCommit(false); //트랜잭션 시작
 
             //비즈니스 로직 수행
-            Member fromMember = memberRepositoryV1.findById(fromId);
-            Member toMember = memberRepositoryV1.findById(toId);
 
-            memberRepositoryV1.update(fromId, fromMember.getMoney() - money);
+            Member fromMember = memberRepository.findById(con, fromId);
+            Member toMember = memberRepository.findById(con, toId);
+
+            memberRepository.update(con, fromId, fromMember.getMoney() - money);
 
             //예외발생 테스트
             validation(toMember);
 
             //검증에서 에러가 발생하면 그 다음 update 로직으로 못넘어간다
             //커밋 이나 롤백
-            memberRepositoryV1.update(toId, toMember.getMoney() + money);
+            memberRepository.update(con, toId, toMember.getMoney() + money);
 
             //정상적으로 수행되면 commit
             con.commit();
