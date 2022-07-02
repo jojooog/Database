@@ -32,7 +32,10 @@ public class MemberServiceV3_2 {
     public void accountTransfer(String fromId, String toId, int money) throws SQLException {
 
         template.executeWithoutResult((status) -> {
+            
+            
             //비즈니스 로직
+            //예외처리
             try {
                 logic(fromId,toId, money );
             } catch (Exception e) {
