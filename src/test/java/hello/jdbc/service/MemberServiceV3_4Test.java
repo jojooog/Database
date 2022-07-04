@@ -53,7 +53,7 @@ class MemberServiceV3_4Test {
         private final DataSource dataSource;
 
 
-        //스프링 컨테이너에 등록된 DataSource 주입받기기
+        //스프링 컨테이너에 등록된 DataSource 주입받기
        public TestConfig(DataSource dataSource) {
             this.dataSource = dataSource;
         }
